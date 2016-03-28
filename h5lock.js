@@ -36,7 +36,8 @@
         var wrap = document.createElement('div')
         var str  = '<h4 id="title" class="title">请绘制解锁图案</h4>'+
                 '<a id="updatePassword" style="position: absolute;right: 5px;top: 5px;color: #FFFFFF; font-size: 10px;display: none">重置密码</a>'+
-                '<canvas id="canvas" width="300" height="300" style="background-color: #305066;display: inline-block;margin-top: 15px;"></canvas>'
+                '<canvas id="canvas" width="300" height="300" style="background-color: #1a1a1a;display: inline-block;margin-top: 15px;"></canvas>'+
+                '<div class="copyright">create by <a href="http://hjjia.github.io/demoList/"  target="_blank" class="link">『卟倒翁』... 佳</a> </div>'
         wrap.setAttribute('style','position:absolute;top:0;left:0;right:0;bottom:0')
 
         wrap.innerHTML = str
