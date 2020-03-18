@@ -5,7 +5,8 @@
     window.h5Lock = function (obj) {
         this.width      = obj.width
         this.height     = obj.height
-        this.chooseType = Number(localStorage.getItem('chooseType')) || obj.chooseType
+        this.chooseType = Number(localStorage.getItem('chooseType')) || obj.chooseType,
+        this.afterDrawFun = obj.afterDrawFun;
     }
 
     //
@@ -13,10 +14,7 @@
 
         //
         this.initDom()
-        this.pswObj = window.localStorage.getItem('passwordxx') ? {
-            step:2,
-            spassword: JSON.parse(window.localStorage.getItem('passwordxx'))
-        }:{};
+        this.pswObj = {};
 
         var lastPoint  = []
         this.touchFlag = false
@@ -34,11 +32,10 @@
     //
     h5Lock.prototype.initDom = function(){
         var wrap = document.createElement('div')
-        var str  = '<h4 id="title" class="title">请绘制解锁图案</h4>'+
-                '<a id="updatePassword" style="position: absolute;right: 5px;top: 5px;color: #FFFFFF; font-size: 10px;display: none">重置密码</a>'+
-                '<canvas id="canvas" width="300" height="300" style="background-color: #1a1a1a;display: inline-block;margin-top: 15px;"></canvas>'+
-                '<div class="copyright">create by <a href="http://hjjia.github.io/demoList/"  target="_blank" class="link">『卟倒翁』... 佳</a> </div>'
-        wrap.setAttribute('style','position:absolute;top:0;left:0;right:0;bottom:0')
+        var str  = '<h4 id="title" class="title">请输入手势密码</h4>'+
+                '<a id="updatePassword" style="position: absolute;right: 5px;top: 5px;color: #FFFFFF; font-size: 10px;display: none"></a>'+
+                '<canvas id="canvas" width="300" height="300" style="background-color: white;display: inline-block;    margin-top: 12vw;"></canvas>';
+        wrap.setAttribute('style','display:flex;justify-content: center;align-items: center;flex-direction: column;');
 
         wrap.innerHTML = str
         document.body.appendChild(wrap)
@@ -95,7 +92,7 @@
                 if(Math.abs(po.x - self.arr[i].x) < self.r && Math.abs(po.y - self.arr[i].y) < self.r){
                     self.touchFlag = true
                     self.drawPoint(self.arr[i].x,self.arr[i].y) // 画实心圆
-                    self.lastPoint.push(self.arr[i])
+                    self.lastPoint.push(self.arr[i]);
                     self.resetPoint.splice(i,1) // 删除resetPoint 中的第i 个元素
                     break;
                 }
@@ -110,7 +107,9 @@
         this.canvas.addEventListener('touchend',function(e){
             if(self.touchFlag){
                 self.touchFlag = false
-                self.storePass(self.lastPoint)
+                self.pswObj.spassword = self.lastPoint
+                self.afterDrawFun(self.getPasswordPath());
+                // console.log(self.pswObj, 'password')
                 setTimeout(function(){
                     self.reset()
                 },300)
@@ -120,10 +119,6 @@
         document.addEventListener('touchmove', function (e) {
             e.preventDefault()
         },false);
-
-        document.getElementById('updatePassword').addEventListener('click',function(){
-            self.updatePassword();
-        })
     }
 
     // touchend 之后  重置解锁面板
@@ -132,89 +127,17 @@
         this.createCircle()
     }
 
+    h5Lock.prototype.getPasswordPath = function () {
+        var res = [];
+        for (var i = 0, len = this.pswObj.spassword.length; i < len; i++) {
+            res.push(this.pswObj.spassword[i].index);
+        }
+        return res;
+    }
+
     // 改变当前状态
     h5Lock.prototype.makeState = function () {
-        /*var step = this.pswObj.step;
-        var updatePassword = document.getElementById('updatePassword');
-
-        if(step == 2){
-            document.getElementById('updatePassword').style.display = 'block';
-            document.getElementById('title').innerHTML = '请解锁'
-        }
-        if(step == 1){
-            updatePassword.style.display = 'none'
-        }
-        else{
-            updatePassword.style.display = 'none'
-        }*/
-        if (this.pswObj.step == 2) {
-            document.getElementById('updatePassword').style.display = 'block';
-            //document.getElementById('chooseType').style.display = 'none';
-            document.getElementById('title').innerHTML = '请解锁';
-        } else if (this.pswObj.step == 1) {
-            //document.getElementById('chooseType').style.display = 'none';
-            document.getElementById('updatePassword').style.display = 'none';
-        } else {
-            document.getElementById('updatePassword').style.display = 'none';
-            //document.getElementById('chooseType').style.display = 'block';
-        }
-    }
-
-    // 储存密码
-    h5Lock.prototype.storePass = function (psw) {
-        if (this.pswObj.step == 1){
-            if(this.checkPass(this.pswObj.fpassword,psw)){
-                this.pswObj.step = 2
-                this.pswObj.spassword = psw
-
-                document.getElementById('title').innerHTML = '密码保存成功'
-                this.drawStatusPoint('#2cff26')
-                window.localStorage.setItem('passwordxx',JSON.stringify(this.pswObj.spassword))
-                window.localStorage.setItem('chooseType',this.chooseType)
-            }
-            else {
-                document.getElementById('title').innerHTML = '两次不一致，重新输入';
-                this.drawStatusPoint('red');
-                delete this.pswObj.step;
-            }
-        }
-        else if(this.pswObj.step == 2){
-            if (this.checkPass(this.pswObj.spassword, psw)) {
-                document.getElementById('title').innerHTML = '解锁成功';
-                this.drawStatusPoint('#2CFF26');
-            } else {
-                this.drawStatusPoint('red');
-                document.getElementById('title').innerHTML = '解锁失败';
-            }
-        }
-        else {
-            this.pswObj.step = 1;
-            this.pswObj.fpassword = psw;
-            document.getElementById('title').innerHTML = '再次输入';
-        }
-
-    }
-
-    // 检查密码
-    h5Lock.prototype.checkPass = function (psw1,psw2) {
-
-        var p1 = '',p2 = '';
-        for(var i = 0 ; i < psw1.length;i++){
-            p1 += psw1[i].index + psw1[i].index
-        }
-        for (var i = 0 ; i < psw2.length ; i++) {
-            p2 += psw2[i].index + psw2[i].index;
-        }
-        return p1 === p2;
-    }
-
-    // 重置密码
-    h5Lock.prototype.updatePassword = function () {
-        window.localStorage.removeItem('passwordxx');
-        window.localStorage.removeItem('chooseType');
-        this.pswObj = {};
-        document.getElementById('title').innerHTML = '绘制解锁图案';
-        this.reset();
+       
     }
 
     // 当密码输入正确时，改变解锁图案的颜色
@@ -298,7 +221,7 @@
     // 初始化圆心
     h5Lock.prototype.drawPoint = function (){
         for(var i = 0;i <this.lastPoint.length; i++){
-            this.ctx.fillStyle = "#cfe6ff"
+            this.ctx.fillStyle = "#ccc"
             this.ctx.beginPath()
             this.ctx.arc(this.lastPoint[i].x,this.lastPoint[i].y,this.r / 2,0, Math.PI * 2,true)
             this.ctx.closePath()
@@ -308,7 +231,7 @@
 
     // 初始化解锁面板
     h5Lock.prototype.drawCle = function(x,y){
-        this.ctx.strokeStyle = '#cfe6ff'
+        this.ctx.strokeStyle = '#ccc'
         this.ctx.lineWidth = 2
         this.ctx.beginPath()
         this.ctx.arc(x,y,this.r,0,2 * Math.PI,true)

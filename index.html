@@ -5,30 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title></title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            height: 100%;
+        }
         body{
+            height: 100%;
             text-align: center;
-            background-color: #1a1a1a;
+            background-color: white;
+            touch-action: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
         .title {
-            color: #22C3AA;
+            color: #ccc;
         }
-        .copyright{
-            margin-top: 20px;
-            color: #FFFFFF;
+        
+        .username {
+            color: #333;
+            font-weight: bold;
+            font-size: 20px;
+            line-height: 2.2;
+            margin-top: -22vw;
         }
-        .copyright .link{
-            color: #337ab7;
+        .footer-fixed {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            line-height: 2;
+            padding-bottom: 4vw;
+        }
+        a {
             text-decoration: none;
         }
-        .copyright .link:hover{
-            color: #23527c;
+
+        .cancel {
+            position: fixed;
+            top: 2vw;
+            left: 4vw;
+            line-height: 2;
+            color: #ccc;
         }
     </style>
 </head>
 <body>
-<script src="h5lock.js"></script>
-<script>
-    new h5Lock({chooseType:3}).init()
-</script>
+    <div class="cancel">
+        取消
+    </div>
+    <div class="username">
+        12345678901
+    </div>
+    <div class="footer-fixed">
+        <a href="javascript:0;">切换账号</a>
+    </div>
+    <script src="h5lock.js"></script>
+    <script>
+        new h5Lock({chooseType:3, afterDrawFun: function (res) {
+            console.log(res, 'from out res')
+        }}).init()
+    </script>
 </body>
 </html>
