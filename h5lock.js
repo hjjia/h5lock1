@@ -32,7 +32,7 @@
     //
     h5Lock.prototype.initDom = function(){
         var wrap = document.createElement('div')
-        var str  = '<h4 id="title" class="title">请输入手势密码</h4>'+
+        var str  = '<p id="title" class="title">请输入手势密码</p>'+
                 '<a id="updatePassword" style="position: absolute;right: 5px;top: 5px;color: #FFFFFF; font-size: 10px;display: none"></a>'+
                 '<canvas id="canvas" width="300" height="300" style="background-color: white;display: inline-block;    margin-top: 12vw;"></canvas>';
         wrap.setAttribute('style','display:flex;justify-content: center;align-items: center;flex-direction: column;');
