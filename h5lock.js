@@ -5,7 +5,8 @@
     window.h5Lock = function (obj) {
         this.width      = obj.width
         this.height     = obj.height
-        this.chooseType = Number(localStorage.getItem('chooseType')) || obj.chooseType,
+        // this.chooseType =  Number(localStorage.getItem('chooseType')) || obj.chooseType,
+        this.chooseType = 3,
         this.afterDrawFun = obj.afterDrawFun;
     }
 
@@ -44,20 +45,24 @@
     h5Lock.prototype.createCircle = function () { //
         var num   = this.chooseType
         var count = 0
-        this.r    = this.ctx.canvas.width / (2 + 4 * num)
+        // this.r    = this.ctx.canvas.width / (2 + 4 * num)
+        this.r    = 4;
 
         this.lastPoint  = []
         this.arr        = []
         this.resetPoint = []
 
         var r = this.r
+        var firstAndEndSpace = 50;
+        var spaceAvg = (this.ctx.canvas.width - 2 * (firstAndEndSpace)) / (num - 1);
+        // var spaceFirst = spaceAvg - r - 2;
 
         for(var i = 0;i < num; i++){
             for(var j = 0;j <num; j++){
                 count++;
                 var obj = {
-                    x: j * 4 * r + 3 * r,
-                    y: i * 4 * r + 3 * r,
+                    x: j * spaceAvg + firstAndEndSpace,
+                    y: i * spaceAvg + firstAndEndSpace,
                     index:count
                 };
                 this.arr.push(obj)
@@ -221,21 +226,22 @@
     // 初始化圆心
     h5Lock.prototype.drawPoint = function (){
         for(var i = 0;i <this.lastPoint.length; i++){
-            this.ctx.fillStyle = "#ccc"
+            this.ctx.strokeStyle = "#0170fe"
+            this.ctx.lineWidth = 2
             this.ctx.beginPath()
-            this.ctx.arc(this.lastPoint[i].x,this.lastPoint[i].y,this.r / 2,0, Math.PI * 2,true)
+            this.ctx.arc(this.lastPoint[i].x,this.lastPoint[i].y,this.r * 6,0, Math.PI * 2,true)
             this.ctx.closePath()
-            this.ctx.fill()
+            this.ctx.stroke()
         }
     }
 
     // 初始化解锁面板
     h5Lock.prototype.drawCle = function(x,y){
-        this.ctx.strokeStyle = '#ccc'
+        this.ctx.fillStyle = '#ccc'
         this.ctx.lineWidth = 2
         this.ctx.beginPath()
         this.ctx.arc(x,y,this.r,0,2 * Math.PI,true)
         this.ctx.closePath()
-        this.ctx.stroke()
+        this.ctx.fill()
     }
 })()
